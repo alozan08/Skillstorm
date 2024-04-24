@@ -1,0 +1,42 @@
+import csv
+
+class Expense:
+    dept_name : str
+    expense_amt : float
+
+    def __init__(self, dept_name, expense_amt):
+        self.dept_name = dept_name
+        self.expense_amt = expense_amt
+
+def returnSum(expense_list, department):
+    result = sum(expense_list.get(department))
+    return result
+
+with open('city-of-seattle-2012-expenditures-dollars.csv', 'r') as file:
+    reader = csv.reader(file, delimiter=',')
+    expense_list = []
+    next(reader)
+    for row in reader:
+        expense = Expense(row[0], row[3])
+        expense_list.append(expense)
+
+expense_dict = {}
+
+for item in expense_list:
+    # if the value is empty, discard
+    if item.expense_amt == '':
+        continue
+    amt_as_int = int(item.expense_amt)
+
+    if not(item.dept_name in expense_dict):
+        expense_dict[item.dept_name] = [amt_as_int]
+    else:
+        expenses = expense_dict[item.dept_name]
+        expenses.append(amt_as_int)
+        expense_dict[item.dept_name] = expenses
+
+for dept_name in expense_dict.keys():
+    result = returnSum(expense_dict, dept_name)
+    print(f'{dept_name}: ${result:,}')
+
+print(expense_dict)
